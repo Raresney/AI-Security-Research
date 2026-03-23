@@ -1,34 +1,26 @@
-AI Red-Teaming Lab Prompts (Safe)
+# AI Hacking Lab
+Projects
 
+Prompt Injection & AI Manipulation
+- Experimenting with prompt injection, instruction override, and AI behavior manipulation.
+- Goal: understand AI vulnerabilities and test alignment weaknesses.
+- Location: `prompts/prompt_injection.json`
 
+Recon AI
+- AI-assisted recon and target analysis.
+- Input: nmap, whois, DNS, open ports.
+- Output: attack vectors, risk scoring, summaries.
+- Location: `prompts/recon_ai.json`
 
-This folder contains 20+ safe prompts for AI red-teaming and prompt injection experiments.
+Phishing AI
+- AI-generated phishing templates (email/SMS) for educational simulations.
+- Includes classification exercises: phishing vs legitimate.
+- Location: `prompts/phishing_ai.json`
 
-All prompts are designed for \*\*educational and simulation purposes only\*\*, with no instructions applicable to real-world attacks.
-
-
-
-Structure
-
-
-
-\- `prompts.json` → JSON file containing all prompts, their types, expected safe outputs, and safety levels.
-
-
+Disclaimer
+- For research and educational purposes only.
+- No illegal usage. Controlled environment only.
 
 Usage
-
-
-
-Load the prompts in any AI sandbox or testing environment to learn about:
-
-\- Prompt injection techniques
-
-\- Red-team AI testing
-
-\- Safe adversarial simulations
-
-
-
-\*\*Note:\*\* Do not use these prompts for real-world hacking. They are strictly educational.
-
+- Open the JSON files in `prompts/` to view or edit prompt/response pairs.
+- Load these prompts into your AI testing environment for safe, controlled experimentation.
