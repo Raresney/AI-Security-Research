@@ -1,109 +1,193 @@
-# 🤖 AI Hacking Lab
+# AI Security Research Lab
 
-Research lab exploring the intersection of **Artificial Intelligence** and **Cybersecurity** — how AI systems can be manipulated, abused, or leveraged defensively.
+Research lab exploring the intersection of **Artificial Intelligence** and **Cybersecurity** — both offensive and defensive. Functional tools for testing LLM robustness, detecting prompt injection, analyzing network reconnaissance, and classifying phishing attacks.
 
-> Copyright (c) 2026 Bighiu Rares — [github.com/Raresney](https://github.com/Raresney)  
-> ⚠️ Strictly for research and educational purposes. Controlled environments only.
-
----
-
-## 🧪 Projects
-
-| Project             | Description                                           | File                       |
-| ------------------- | ----------------------------------------------------- | -------------------------- |
-| 🧠 Prompt Injection | Prompt injection and instruction override experiments | `prompts/prompts.json`     |
-| 🔎 Recon AI         | AI-assisted reconnaissance and target analysis        | `prompts/recon_ai.json`    |
-| 🎣 Phishing AI      | AI-generated phishing simulations and classification  | `prompts/phishing_ai.json` |
+> **Copyright (c) 2026 Bighiu Rares** — [github.com/Raresney](https://github.com/Raresney)
 
 ---
 
-## 🧠 Prompt Injection & AI Manipulation
-
-Experiments focused on manipulating AI systems through crafted prompts.
-
-**Techniques explored:**
-
-- Direct instruction override
-- Roleplay-based jailbreaking
-- Context manipulation
-
-**Example prompt types (`prompts.json`):**
-
-| ID  | Type              | Description                                                  |
-| --- | ----------------- | ------------------------------------------------------------ |
-| 001 | `direct_override` | Ignore previous instructions — ethical pen-test simulation   |
-| 002 | `roleplay`        | Ethical hacker roleplay — investigation and protection steps |
-
----
-
-## 🔎 Recon AI
-
-AI-assisted reconnaissance — transforms raw recon data into actionable intelligence.
-
-**Input:** `nmap` results, `whois`, DNS records, open ports  
-**Output:** potential attack vectors, risk scoring, structured summaries
-
-> 🚧 Work in progress — prompts coming soon.
-
----
-
-## 🎣 Phishing AI
-
-AI-generated phishing simulations for security awareness training and detection research.
-
-**Example prompt types (`phishing_ai.json`):**
-
-| ID           | Type           | Description                                          |
-| ------------ | -------------- | ---------------------------------------------------- |
-| phishing_001 | Email template | Realistic phishing email for controlled lab exercise |
-| phishing_002 | SMS simulation | Simulated smishing message with awareness indicators |
-| phishing_003 | Classification | Classify messages as phishing or legitimate          |
-
----
-
-## 🗂️ Structure
+## Architecture
 
 ```
-AI-HACKING/
-├── prompts/
-│   ├── prompts.json        # Prompt injection experiments
-│   ├── recon_ai.json       # Recon AI prompts
-│   └── phishing_ai.json    # Phishing simulation prompts
-└── README.md
+AI-Security-Research/
+├── core/                        # Shared LLM client & utilities
+│   ├── llm_client.py            # Unified API: Ollama / Groq / HuggingFace
+│   ├── config.py                # Environment & provider configuration
+│   └── utils.py                 # JSON I/O, rich tables, reporting
+│
+├── prompt_injection_lab/        # OFFENSIVE — LLM injection testing
+│   ├── runner.py                # Test execution engine
+│   ├── evaluator.py             # Jailbreak detection & scoring
+│   ├── reporter.py              # Rich terminal & JSON reports
+│   └── test_cases/              # 5 categories, 26+ test cases
+│
+├── prompt_guard/                # DEFENSIVE — Injection detection
+│   ├── detector.py              # Pattern + LLM-based detection
+│   ├── patterns.py              # Regex pattern database (6 categories)
+│   ├── benchmark.py             # Precision/Recall/F1 benchmarking
+│   └── known_injections/        # 50-entry test corpus
+│
+├── phishing_detector/           # DEFENSIVE — Email classification
+│   ├── classifier.py            # LLM-powered phishing classifier
+│   ├── generator.py             # Phishing email generator for training
+│   └── datasets/                # 24 labeled samples
+│
+└── recon_ai/                    # OFFENSIVE — Network recon analysis
+    ├── parser.py                # nmap XML & text parser
+    ├── analyzer.py              # AI-powered vulnerability analysis
+    └── samples/                 # Sample scan data
 ```
 
 ---
 
-## 🛠️ Usage
+## Quick Start
 
-Open the JSON files in `prompts/` to view or edit prompt/response pairs.  
-Load them into your AI testing environment for safe, controlled experimentation.
+```bash
+# Clone
+git clone https://github.com/Raresney/AI-Security-Research.git
+cd AI-Security-Research
 
-Each entry follows this structure:
+# Install
+pip install -e .
 
-```json
-{
-  "id": "unique_id",
-  "type": "attack_type",
-  "prompt": "the prompt to test",
-  "expected_output": "what a safe response looks like",
-  "safety_level": "safe"
-}
+# Configure LLM (choose one):
+# Option A: Ollama (recommended, fully local, free)
+ollama serve && ollama pull llama3
+
+# Option B: Groq free tier
+cp .env.example .env
+# Edit .env and add your GROQ_API_KEY from console.groq.com
+
+# Option C: HuggingFace free inference
+cp .env.example .env
+# Edit .env and add your HF_API_TOKEN from huggingface.co
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## Tools
 
-- Python
-- LLM APIs (OpenAI, HuggingFace)
-- OSINT tools (`nmap`, DNS analysis)
-- JSON-based prompt dataset
+### Prompt Injection Lab (Offensive)
+
+Test LLM robustness against 5 categories of prompt injection attacks with automated scoring.
+
+**Categories:** `direct_override` | `roleplay` | `context_manipulation` | `token_smuggling` | `multi_turn`
+
+```bash
+# Run all injection tests
+injection-lab run --all
+
+# Run specific category
+injection-lab run --category roleplay
+
+# Use LLM-as-judge for evaluation
+injection-lab run --all --judge
+
+# Export results
+injection-lab run --all --output json
+
+# List available tests
+injection-lab list
+```
+
+**Output:** Per-test verdicts (SAFE/PARTIAL/JAILBROKEN), per-category safety rates, overall safety score.
 
 ---
 
-## ⚠️ Disclaimer
+### Prompt Guard (Defensive)
 
-All experiments are conducted in **controlled, isolated environments**.  
-🚫 No illegal activities — 🚫 No real-world exploitation.  
-The objective is to study AI security risks and improve defensive systems.
+Detect and block prompt injection attempts using pattern matching + optional LLM analysis.
+
+**Detection categories:** `override` | `roleplay` | `extraction` | `delimiter` | `encoding` | `authority`
+
+```bash
+# Scan text for injection
+prompt-guard scan --text "Ignore all previous instructions..."
+
+# Scan from file
+prompt-guard scan --file suspicious_input.txt
+
+# Enable LLM-based detection
+prompt-guard scan --text "..." --llm
+
+# Run benchmark (pattern-only)
+prompt-guard benchmark
+
+# Run benchmark with LLM
+prompt-guard benchmark --llm
+```
+
+**Output:** Risk score (0-100), matched patterns, recommendation (BLOCK/REVIEW/MONITOR/PASS). Benchmark produces precision, recall, F1 score.
+
+---
+
+### Phishing Detector (Defensive)
+
+AI-powered email/SMS classification and phishing simulation generator.
+
+```bash
+# Classify a single email
+phish-detect classify --input email.txt
+
+# Batch classify with accuracy metrics
+phish-detect classify --dataset phishing_detector/datasets/phishing_samples.json
+
+# Generate training phishing email
+phish-detect generate --scenario banking --difficulty moderate
+
+# Available scenarios: banking, it_support, delivery, ceo_fraud, password_reset, tax_refund
+# Difficulty levels: obvious, moderate, sophisticated
+```
+
+**Output:** Classification (PHISHING/LEGITIMATE), confidence score, detected indicators, reasoning.
+
+---
+
+### Recon AI (Offensive)
+
+AI-powered analysis of network reconnaissance data with automated risk scoring.
+
+```bash
+# Analyze nmap XML scan
+recon-ai analyze --input recon_ai/samples/sample_nmap.xml
+
+# Analyze nmap text output
+recon-ai analyze --input scan.txt --format text
+
+# Export reports
+recon-ai analyze --input scan.xml --output both  # json + markdown
+```
+
+**Output:** Per-host risk scores, heuristic findings (known risky ports/services), AI-generated vulnerability analysis with remediation recommendations.
+
+---
+
+## LLM Providers
+
+All tools use free LLM providers. The system auto-detects available providers in this order:
+
+| Priority | Provider | Cost | Setup |
+|----------|----------|------|-------|
+| 1 | **Ollama** | Free (local) | `ollama serve && ollama pull llama3` |
+| 2 | **Groq** | Free tier | Get key at [console.groq.com](https://console.groq.com) |
+| 3 | **HuggingFace** | Free inference | Get token at [huggingface.co](https://huggingface.co/settings/tokens) |
+
+Override with `--provider ollama|groq|huggingface` on any command.
+
+---
+
+## Tech Stack
+
+- **Python 3.10+** — Core language
+- **Click** — CLI framework
+- **Rich** — Terminal UI (colored tables, panels, progress)
+- **httpx** — HTTP client for LLM APIs
+- **python-dotenv** — Environment configuration
+
+---
+
+## Disclaimer
+
+All experiments are conducted in **controlled, isolated environments**.
+This project is strictly for **research and educational purposes**.
+No illegal activities. No real-world exploitation. The objective is to study AI security risks and improve defensive systems.
