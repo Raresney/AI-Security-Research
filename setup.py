@@ -14,6 +14,7 @@ setup(
         "httpx>=0.27",
         "rich>=13.0",
         "python-dotenv>=1.0",
+        "chromadb>=0.5",
     ],
     entry_points={
         "console_scripts": [
@@ -21,6 +22,8 @@ setup(
             "recon-ai=recon_ai.cli:main",
             "phish-detect=phishing_detector.cli:main",
             "prompt-guard=prompt_guard.cli:main",
+            "rag-poison=rag_poison_lab.cli:main",
+            "honeypot=llm_honeypot.cli:main",
         ],
     },
 )
