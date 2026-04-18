@@ -82,6 +82,14 @@ rag-poison list-techniques
 
 ---
 
+## Example Output
+
+![RAG Poisoning results — all probes flagged POISONED](../docs/screenshots/rag_poison_results.png)
+
+*Sample run showing `direct_override` and `indirect_injection` techniques successfully manipulating the LLM into returning attacker-injected credentials and policy "updates".*
+
+---
+
 ## Output
 
 For each probe question:

@@ -202,6 +202,8 @@ rag-poison list-techniques
 
 **Output:** Per-technique success rates, RAG resilience score (CRITICAL/VULNERABLE/RESILIENT), retrieved poisoned documents, success indicators found in LLM responses. JSON reports include full probe results.
 
+![RAG Poisoning results](docs/screenshots/rag_poison_results.png)
+
 See [`rag_poison_lab/README.md`](rag_poison_lab/README.md) for technique details.
 
 ---
@@ -230,6 +232,8 @@ honeypot list-personas
 ```
 
 **Output:** Live attack technique detection per turn (with MITRE ATLAS mapping), risk scoring (0-100), end-of-session attacker profile (sophistication, primary objective, observed tactics), LLM-generated threat intelligence summary, and security recommendations.
+
+![LLM Honeypot session report](docs/screenshots/honeypot_report.png)
 
 See [`llm_honeypot/README.md`](llm_honeypot/README.md) for persona details and detection logic.
 

@@ -78,6 +78,14 @@ Each user message is analyzed with regex patterns for these techniques and mappe
 
 ---
 
+## Example Output
+
+![LLM Honeypot session report with MITRE ATLAS mapping and threat intel summary](../docs/screenshots/honeypot_report.png)
+
+*Session report showing detected techniques mapped to MITRE ATLAS (AML.T0051, T0054, T0057, T0058), per-turn risk scores, and an LLM-generated threat intelligence summary classifying the attacker as "advanced sophistication".*
+
+---
+
 ## Usage
 
 ### Start an interactive honeypot session
