@@ -1,6 +1,6 @@
 # AI Security Research Lab
 
-Research lab exploring the intersection of **Artificial Intelligence** and **Cybersecurity** — both offensive and defensive. Functional tools for testing LLM robustness, detecting prompt injection, analyzing network reconnaissance, and classifying phishing attacks.
+Research lab exploring the intersection of **Artificial Intelligence** and **Cybersecurity** — both offensive and defensive. Functional tools for testing LLM robustness, detecting prompt injection, poisoning RAG knowledge bases, deploying AI honeypots, analyzing network reconnaissance, and classifying phishing attacks.
 
 > **Copyright (c) 2026 Bighiu Rares** — [github.com/Raresney](https://github.com/Raresney)
 
@@ -32,10 +32,22 @@ AI-Security-Research/
 │   ├── generator.py             # Phishing email generator for training
 │   └── datasets/                # 24 labeled samples
 │
-└── recon_ai/                    # OFFENSIVE — Network recon analysis
-    ├── parser.py                # nmap XML & text parser
-    ├── analyzer.py              # AI-powered vulnerability analysis
-    └── samples/                 # Sample scan data
+├── recon_ai/                    # OFFENSIVE — Network recon analysis
+│   ├── parser.py                # nmap XML & text parser
+│   ├── analyzer.py              # AI-powered vulnerability analysis
+│   └── samples/                 # Sample scan data
+│
+├── rag_poison_lab/              # OFFENSIVE — RAG knowledge base attacks
+│   ├── store.py                 # ChromaDB vector store wrapper
+│   ├── poisoner.py              # 5 attack techniques + payload loader
+│   ├── evaluator.py             # RAG pipeline + poison success detection
+│   └── datasets/                # 15 legitimate docs + 10 poison payloads
+│
+└── llm_honeypot/                # DEFENSIVE — AI honeypot & threat intel
+    ├── personas.py              # 4 vulnerable AI personas
+    ├── honeypot.py              # Interactive session engine
+    ├── analyzer.py              # MITRE ATLAS technique classifier
+    └── session_logger.py        # Session capture & replay
 ```
 
 ---
@@ -162,6 +174,67 @@ recon-ai analyze --input scan.xml --output both  # json + markdown
 
 ---
 
+### RAG Poisoning Lab (Offensive)
+
+Test Retrieval-Augmented Generation systems against knowledge-base poisoning attacks. Builds a real RAG pipeline with ChromaDB, injects malicious documents, and measures how often the LLM swallows the bait.
+
+**Techniques:** `direct_override` | `indirect_injection` | `context_hijacking` | `role_reassignment` | `trigger_based`
+
+```bash
+# Run a single attack technique
+rag-poison attack --technique direct_override --verbose
+
+# Run all techniques against the knowledge base
+rag-poison attack --all --output
+
+# Benchmark all techniques side-by-side
+rag-poison benchmark
+
+# Use LLM-as-judge for borderline cases
+rag-poison attack --all --judge
+
+# Query a clean RAG for baseline comparison
+rag-poison ask "What are the password policy requirements?"
+
+# List all available techniques
+rag-poison list-techniques
+```
+
+**Output:** Per-technique success rates, RAG resilience score (CRITICAL/VULNERABLE/RESILIENT), retrieved poisoned documents, success indicators found in LLM responses. JSON reports include full probe results.
+
+See [`rag_poison_lab/README.md`](rag_poison_lab/README.md) for technique details.
+
+---
+
+### LLM Honeypot (Defensive)
+
+Deploy a convincing fake AI assistant to attract attackers, log their attempts, and classify their techniques against the **MITRE ATLAS** framework. Generates threat intelligence reports with attacker profiles.
+
+**Personas:** `internalGPT` | `adminBot` | `devAssistant` | `dataBot`
+
+```bash
+# Start an interactive honeypot session
+honeypot start --persona adminBot
+
+# Show real-time attack detection overlay
+honeypot start --persona dataBot --analysis
+
+# View the most recent session report
+honeypot report
+
+# List all recorded sessions
+honeypot list-sessions
+
+# List available personas
+honeypot list-personas
+```
+
+**Output:** Live attack technique detection per turn (with MITRE ATLAS mapping), risk scoring (0-100), end-of-session attacker profile (sophistication, primary objective, observed tactics), LLM-generated threat intelligence summary, and security recommendations.
+
+See [`llm_honeypot/README.md`](llm_honeypot/README.md) for persona details and detection logic.
+
+---
+
 ## LLM Providers
 
 All tools use free LLM providers. The system auto-detects available providers in this order:
@@ -183,6 +256,7 @@ Override with `--provider ollama|groq|huggingface` on any command.
 - **Rich** — Terminal UI (colored tables, panels, progress)
 - **httpx** — HTTP client for LLM APIs
 - **python-dotenv** — Environment configuration
+- **ChromaDB** — Vector store for RAG poisoning experiments
 
 ---
 
