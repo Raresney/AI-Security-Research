@@ -1,6 +1,5 @@
 """Evaluation metrics and visualization for adversarial IDS experiments."""
 
-import os
 from pathlib import Path
 
 import numpy as np

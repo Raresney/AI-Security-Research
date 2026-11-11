@@ -52,7 +52,7 @@ def classify(input_file, dataset, provider, output):
             for msg, result in zip(messages, results):
                 print_classification(result, msg.get("id", ""))
 
-            has_labels = all(l in ("phishing", "legitimate") for l in true_labels)
+            has_labels = all(label in ("phishing", "legitimate") for label in true_labels)
             print_batch_summary(results, true_labels if has_labels else None)
 
             if output == "json":

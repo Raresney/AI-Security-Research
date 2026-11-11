@@ -150,7 +150,7 @@ def list_personas_cmd():
             p.display_name,
             p.description[:38] + "…" if len(p.description) > 40 else p.description,
             f"[{vuln_color}]{p.vulnerability_level.upper()}[/{vuln_color}]",
-            "\n".join(f"• {l[:35]}" for l in p.lure_details),
+            "\n".join(f"• {lure[:35]}" for lure in p.lure_details),
         )
 
     console.print()

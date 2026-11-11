@@ -148,7 +148,6 @@ def list_techniques():
     """List all available attack techniques."""
     from rich.table import Table
     from rich import box
-    from rich.panel import Panel as P
 
     table = Table(box=box.ROUNDED, border_style="cyan", show_header=True)
     table.add_column("Technique", style="bold cyan")
