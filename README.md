@@ -1,6 +1,6 @@
 # AI Security Research Lab
 
-A collection of working tools at the intersection of AI and cybersecurity, offensive and defensive. They test LLM robustness, detect prompt injection, poison RAG knowledge bases, run AI honeypots, analyze network recon, classify phishing, and attack ML-based intrusion detectors.
+A collection of working tools at the intersection of AI and cybersecurity, offensive and defensive. They test LLM robustness, detect prompt injection, poison RAG knowledge bases, run AI honeypots, analyze network recon, classify phishing, and attack ML-based intrusion detectors. An arena ties the attack and defense sides together.
 
 Copyright (c) 2026 Bighiu Rares, [github.com/Raresney](https://github.com/Raresney)
 
@@ -49,11 +49,17 @@ AI-Security-Research/
 │   ├── analyzer.py              # MITRE ATLAS technique classifier
 │   └── session_logger.py        # Session capture & replay
 │
-└── adversarial_ids/             # OFFENSIVE: adversarial ML against an IDS
-    ├── main.py                  # Train, attack, evaluate pipeline
-    ├── models/ids_model.py      # PyTorch MLP classifier (NSL-KDD)
-    ├── attacks/adversarial.py   # FGSM, PGD, Carlini-Wagner
-    └── utils/evaluation.py      # Metrics and charts
+├── adversarial_ids/             # OFFENSIVE: adversarial ML against an IDS
+│   ├── main.py                  # Train, attack, evaluate pipeline
+│   ├── models/ids_model.py      # PyTorch MLP classifier (NSL-KDD)
+│   ├── attacks/adversarial.py   # FGSM, PGD, Carlini-Wagner
+│   └── utils/evaluation.py      # Metrics and charts
+│
+└── arena/                       # RED VS BLUE: mutating payloads vs an adaptive filter
+    ├── mutators.py              # 8 rule-based payload mutators
+    ├── defender.py              # prompt_guard plus 3 hardening levels
+    ├── engine.py                # Round loop and held-out check
+    └── report.py                # JSON and HTML report
 ```
 
 ---
@@ -65,15 +71,16 @@ AI-Security-Research/
 git clone https://github.com/Raresney/AI-Security-Research.git
 cd AI-Security-Research
 
-# Install
+# Install (add [ml] for the adversarial_ids module, [dev] for tests)
 pip install -e .
+pip install -e ".[ml,dev]"
 
-# The adversarial_ids module has its own dependencies (PyTorch etc.)
-pip install -r adversarial_ids/requirements.txt
+# Run the tests
+pytest
 
 # Configure LLM (choose one):
 # Option A: Ollama (recommended, fully local, free)
-ollama serve && ollama pull llama3
+ollama serve && ollama pull llama3.1
 
 # Option B: Groq free tier
 cp .env.example .env
@@ -253,10 +260,9 @@ See [`llm_honeypot/README.md`](llm_honeypot/README.md) for persona details and d
 Trains a neural network intrusion detector on NSL-KDD, then attacks it with FGSM, PGD and Carlini-Wagner to measure how much accuracy survives.
 
 ```bash
-cd adversarial_ids
-python main.py                                   # binary, epsilon 0.1
-python main.py --epochs 50 --epsilon 0.2         # custom run
-python main.py --no-binary                       # normal/dos/probe/r2l/u2r
+adversarial-ids                                  # binary, epsilon 0.1
+adversarial-ids --epochs 50 --epsilon 0.2        # custom run
+adversarial-ids --no-binary                      # normal/dos/probe/r2l/u2r
 ```
 
 In the default run, clean accuracy is 78.24%. It falls to 4.13% under FGSM, 0.83% under PGD and 0.13% under C&W.
@@ -267,13 +273,31 @@ See [`adversarial_ids/README.md`](adversarial_ids/README.md) for the full write-
 
 ---
 
+### Arena (Red vs Blue)
+
+Mutates the attack payloads from the other tools against `prompt_guard` while the defender hardens round by round, and scores both sides: attacks that get through, and benign prompts wrongly flagged.
+
+```bash
+aisec-arena run                          # 6 rounds, seed 1
+aisec-arena run --rounds 8 --output      # also writes JSON and HTML reports to reports/
+aisec-arena run --llm                    # let a model rewrite blocked payloads as well
+```
+
+Out of the box, 45.9% of the original payloads get past the stock filter. After 8 rounds the hardened filter lets through 1.2% of fresh mutations it has never seen (6 of 488), with no false positives on 102 benign prompts. The held-out number is the one to trust.
+
+![Arena report](docs/screenshots/arena_report.png)
+
+See [`arena/README.md`](arena/README.md) for the mutators, defender levels and limits.
+
+---
+
 ## LLM Providers
 
-The LLM-based tools run on free providers. The client picks the first one it can reach, in this order:
+The LLM-based tools run on free providers. The client picks the first one it can reach, in this order. With Ollama, set `OLLAMA_MODEL` or leave it empty to use the first model you have installed:
 
 | Priority | Provider | Cost | Setup |
 |----------|----------|------|-------|
-| 1 | **Ollama** | Free (local) | `ollama serve && ollama pull llama3` |
+| 1 | **Ollama** | Free (local) | `ollama serve && ollama pull llama3.1` |
 | 2 | **Groq** | Free tier | Get key at [console.groq.com](https://console.groq.com) |
 | 3 | **HuggingFace** | Free inference | Get token at [huggingface.co](https://huggingface.co/settings/tokens) |
 
