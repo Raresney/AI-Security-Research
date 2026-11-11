@@ -51,11 +51,11 @@ Default run, 6 rounds, seed 1:
 | Round | Defender | Evaded | False positives |
 |---|---|---|---|
 | 1 | level 0 | 48.8% | 0.0% |
-| 2 | level 1 | 62.8% | 0.0% |
-| 3 | level 2 | 39.5% | 0.0% |
-| 4 | level 3 | 53.5% | 0.0% |
-| 5 | level 3 | 14.0% | 0.0% |
-| 6 | level 3 | 9.3% | 0.0% |
+| 2 | level 1 | 65.1% | 0.0% |
+| 3 | level 2 | 41.9% | 0.0% |
+| 4 | level 3 | 41.9% | 0.0% |
+| 5 | level 3 | 4.7% | 0.0% |
+| 6 | level 3 | 7.0% | 0.0% |
 
 ![Arena report](../docs/screenshots/arena_report.png)
 
@@ -66,9 +66,9 @@ The held-out check is the fairer number. It mutates 18 attacks the defender neve
 | Defender | Fresh mutations that evade |
 |---|---|
 | level 0, stock filter | 93.5% (404 of 432) |
-| level 2, normalization and decoding | 37.7% (163 of 432) |
-| level 3, after 6 rounds | 26.2% (113 of 432) |
+| level 2, normalization and decoding | 38.4% (166 of 432) |
+| level 3, after 6 rounds | 28.0% (121 of 432) |
 
-Normalization and decoding do most of the work. Learning word pairs from evaded payloads adds about 11 points on top. False positives on the 41 held-back benign prompts were 0 for seeds 1 and 3 and 1 prompt (2.4%) for seed 2.
+Normalization and decoding do most of the work. Learning word pairs from evaded payloads adds about 10 points on top. False positives on the 41 held-back benign prompts were 0 for seeds 1 and 3 and 1 prompt (2.4%) for seed 2.
 
 Limits: the benign set is small, so one prompt moves the rate by 2.4 points. The wrapper mutators use fixed wording, which a learned pair can latch onto. `language_switch` only knows a handful of phrases. A filter tuned this way would still be weak against an attacker whose tricks it has not seen.

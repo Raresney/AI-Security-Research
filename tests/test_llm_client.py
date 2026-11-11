@@ -160,3 +160,49 @@ def test_retries_zero_means_single_attempt(cfg):
 def test_timeout_is_configurable(cfg):
     client = LLMClient(LLMProvider.GROQ, transport=transport(lambda r: httpx.Response(200)), timeout=7.0)
     assert client._client.timeout.read == 7.0
+
+
+def test_generate_retries_on_remote_protocol_error(cfg):
+    calls = []
+
+    def handler(request):
+        calls.append(request)
+        if len(calls) < 2:
+            raise httpx.RemoteProtocolError("server disconnected", request=request)
+        return httpx.Response(200, json={"choices": [{"message": {"content": "hi"}}]})
+
+    client = LLMClient(LLMProvider.GROQ, transport=transport(handler))
+    assert client.generate("p") == "hi"
+    assert len(calls) == 2
+
+
+def test_retry_after_header_sets_the_wait(cfg, monkeypatch):
+    waits = []
+    monkeypatch.setattr(llm_client, "_sleep", waits.append)
+    calls = []
+
+    def handler(request):
+        calls.append(request)
+        if len(calls) == 1:
+            return httpx.Response(429, headers={"Retry-After": "7"})
+        return httpx.Response(200, json={"choices": [{"message": {"content": "hi"}}]})
+
+    client = LLMClient(LLMProvider.GROQ, transport=transport(handler))
+    assert client.generate("p") == "hi"
+    assert waits == [7.0]
+
+
+def test_retry_after_is_capped_and_bad_values_ignored(cfg, monkeypatch):
+    waits = []
+    monkeypatch.setattr(llm_client, "_sleep", waits.append)
+    replies = iter([("9999", 429), ("soon", 503), (None, 200)])
+
+    def handler(request):
+        value, code = next(replies)
+        if code == 200:
+            return httpx.Response(200, json={"choices": [{"message": {"content": "hi"}}]})
+        return httpx.Response(code, headers={"Retry-After": value})
+
+    client = LLMClient(LLMProvider.GROQ, transport=transport(handler))
+    assert client.generate("p") == "hi"
+    assert waits == [llm_client.MAX_RETRY_AFTER, 1.0]

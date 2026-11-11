@@ -7,11 +7,22 @@ from .config import LLMProvider, ProviderConfig, get_provider_config
 
 RETRY_STATUSES = {429, 500, 502, 503, 504}
 RETRY_DELAYS = (0.5, 1.0, 2.0)
+MAX_RETRY_AFTER = 30.0
 FALLBACK_OLLAMA_MODEL = "llama3.1"
 
 
 def _sleep(seconds: float) -> None:
     time.sleep(seconds)
+
+
+def _retry_after(response: httpx.Response) -> float | None:
+    try:
+        seconds = float(response.headers.get("Retry-After", ""))
+    except ValueError:
+        return None
+    if seconds < 0 or seconds != seconds:
+        return None
+    return min(seconds, MAX_RETRY_AFTER)
 
 
 class LLMClient:
@@ -86,7 +97,10 @@ class LLMClient:
                     return r
                 if delay is None:
                     r.raise_for_status()
-            except (httpx.TimeoutException, httpx.ConnectError):
+                hinted = _retry_after(r)
+                if hinted is not None:
+                    delay = hinted
+            except (httpx.TimeoutException, httpx.NetworkError, httpx.ProtocolError):
                 if delay is None:
                     raise
             _sleep(delay)

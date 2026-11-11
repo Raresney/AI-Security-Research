@@ -146,3 +146,15 @@ def test_learned_pairs_are_checked_inside_decoded_text():
         d.harden([Sample("x", "t", phrase, "attack")], [])
     enc = base64.b64encode(phrase.encode()).decode()
     assert d.blocks(f"b64 payload for you: {enc}")
+
+
+def test_normalize_keeps_version_style_tokens():
+    from arena.defender import normalize
+
+    assert normalize("Python3 and gpt-4 and llama-3.1") == "python3 and gpt-4 and llama-3.1"
+
+
+def test_normalize_still_folds_leet_inside_words():
+    from arena.defender import normalize
+
+    assert normalize("1gn0re pr3vious") == "ignore previous"
