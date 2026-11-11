@@ -11,10 +11,10 @@ from pathlib import Path
 
 import numpy as np
 
-from data.loader import NSLKDDLoader
-from models.ids_model import IDSTrainer
-from attacks.adversarial import AdversarialAttacker
-from utils.evaluation import (
+from adversarial_ids.data.loader import NSLKDDLoader
+from adversarial_ids.models.ids_model import IDSTrainer
+from adversarial_ids.attacks.adversarial import AdversarialAttacker
+from adversarial_ids.utils.evaluation import (
     compute_metrics,
     plot_accuracy_comparison,
     plot_confusion_matrices,

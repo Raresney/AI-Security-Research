@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-security-research"
+version = "1.1.0"
+description = "AI security research lab: offensive and defensive tools for LLMs and ML systems"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Bighiu Rares", email = "bighiurares05@gmail.com" }]
+dependencies = [
+    "click>=8.1",
+    "httpx>=0.27",
+    "rich>=13.0",
+    "python-dotenv>=1.0",
+    "chromadb>=0.5",
+]
+
+[project.optional-dependencies]
+ml = ["torch>=2.0", "numpy>=1.24", "pandas>=2.0", "scikit-learn>=1.3", "matplotlib>=3.7"]
+dev = ["pytest>=8.0", "ruff>=0.5"]
+
+[project.urls]
+Homepage = "https://github.com/Raresney/AI-Security-Research"
+
+[project.scripts]
+injection-lab = "prompt_injection_lab.cli:main"
+recon-ai = "recon_ai.cli:main"
+phish-detect = "phishing_detector.cli:main"
+prompt-guard = "prompt_guard.cli:main"
+rag-poison = "rag_poison_lab.cli:main"
+honeypot = "llm_honeypot.cli:main"
+adversarial-ids = "adversarial_ids.main:main"
+aisec-arena = "arena.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["core*", "prompt_injection_lab*", "prompt_guard*", "phishing_detector*", "recon_ai*", "rag_poison_lab*", "llm_honeypot*", "adversarial_ids*", "arena*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.json", "*.xml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 110
+exclude = ["adversarial_ids/data/raw"]
