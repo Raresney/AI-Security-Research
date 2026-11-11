@@ -11,7 +11,7 @@ console = Console()
 
 @click.group()
 def main():
-    """Prompt Injection Testing Lab — Test LLM robustness against injection attacks."""
+    """Prompt Injection Testing Lab - Test LLM robustness against injection attacks."""
     pass
 
 

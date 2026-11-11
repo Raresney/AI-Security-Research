@@ -13,7 +13,7 @@ console = Console()
 
 @click.group()
 def main():
-    """Phishing Detector — AI-powered phishing email classification and simulation."""
+    """Phishing Detector - AI-powered phishing email classification and simulation."""
     pass
 
 

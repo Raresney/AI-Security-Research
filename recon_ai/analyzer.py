@@ -6,24 +6,24 @@ from .parser import ScanData, Host
 
 # Ports that are inherently high-risk when open
 HIGH_RISK_PORTS = {
-    21: "FTP — often allows anonymous access or cleartext credentials",
-    23: "Telnet — cleartext protocol, highly insecure",
-    25: "SMTP — can be abused for email relay",
-    445: "SMB — common target for ransomware and lateral movement",
-    3389: "RDP — brute force target, frequent exploit vector",
-    5900: "VNC — often weak authentication",
-    6379: "Redis — commonly exposed without authentication",
-    27017: "MongoDB — frequently exposed without auth",
+    21: "FTP - often allows anonymous access or cleartext credentials",
+    23: "Telnet - cleartext protocol, highly insecure",
+    25: "SMTP - can be abused for email relay",
+    445: "SMB - common target for ransomware and lateral movement",
+    3389: "RDP - brute force target, frequent exploit vector",
+    5900: "VNC - often weak authentication",
+    6379: "Redis - commonly exposed without authentication",
+    27017: "MongoDB - frequently exposed without auth",
 }
 
 MEDIUM_RISK_PORTS = {
-    22: "SSH — secure but brute-forceable",
-    80: "HTTP — check for web vulnerabilities",
-    443: "HTTPS — check for TLS misconfigurations",
-    3306: "MySQL — should not be publicly exposed",
-    5432: "PostgreSQL — should not be publicly exposed",
-    8080: "HTTP Proxy — often misconfigured",
-    8443: "HTTPS Alt — check for web vulnerabilities",
+    22: "SSH - secure but brute-forceable",
+    80: "HTTP - check for web vulnerabilities",
+    443: "HTTPS - check for TLS misconfigurations",
+    3306: "MySQL - should not be publicly exposed",
+    5432: "PostgreSQL - should not be publicly exposed",
+    8080: "HTTP Proxy - often misconfigured",
+    8443: "HTTPS Alt - check for web vulnerabilities",
 }
 
 
@@ -104,7 +104,7 @@ def _format_host_for_llm(host: Host) -> str:
     lines.append("Open ports:")
     for p in host.ports:
         if p.state == "open":
-            line = f"  {p.number}/{p.protocol} — {p.service}"
+            line = f"  {p.number}/{p.protocol} - {p.service}"
             if p.version:
                 line += f" ({p.version})"
             lines.append(line)

@@ -36,7 +36,7 @@
   },
   {
     "id": "doc_008",
-    "text": "Customer Data Handling: Customer personally identifiable information (PII) must never be stored in logs, error messages, or development environments. Data minimization principles apply — collect only what is necessary. Customer data deletion requests must be processed within 30 days per GDPR compliance requirements.",
+    "text": "Customer Data Handling: Customer personally identifiable information (PII) must never be stored in logs, error messages, or development environments. Data minimization principles apply - collect only what is necessary. Customer data deletion requests must be processed within 30 days per GDPR compliance requirements.",
     "metadata": {"source": "Legal & Compliance v1.2", "category": "privacy", "date": "2025-02-20"}
   },
   {

@@ -8,42 +8,42 @@ from core.llm_client import LLMClient
 MITRE_ATLAS_TACTICS = {
     "prompt_injection": {
         "tactic": "ML Attack Staging",
-        "technique": "AML.T0051 — LLM Prompt Injection",
+        "technique": "AML.T0051 - LLM Prompt Injection",
         "description": "Attacker injects instructions into the prompt to override system behavior",
     },
     "jailbreak": {
         "tactic": "ML Attack Staging",
-        "technique": "AML.T0054 — LLM Jailbreak",
+        "technique": "AML.T0054 - LLM Jailbreak",
         "description": "Attacker bypasses safety filters through roleplay, personas, or encoding tricks",
     },
     "system_prompt_extraction": {
         "tactic": "Reconnaissance",
-        "technique": "AML.T0056 — LLM Meta-Prompt Extraction",
+        "technique": "AML.T0056 - LLM Meta-Prompt Extraction",
         "description": "Attacker attempts to reveal the system prompt or internal instructions",
     },
     "credential_extraction": {
         "tactic": "Exfiltration",
-        "technique": "AML.T0058 — Exfiltration via ML Inference API",
+        "technique": "AML.T0058 - Exfiltration via ML Inference API",
         "description": "Attacker attempts to extract credentials, secrets, or sensitive data",
     },
     "privilege_escalation": {
         "tactic": "Privilege Escalation",
-        "technique": "AML.T0057 — LLM Plugin Compromise",
+        "technique": "AML.T0057 - LLM Plugin Compromise",
         "description": "Attacker tries to escalate permissions or activate elevated-privilege modes",
     },
     "social_engineering": {
         "tactic": "Initial Access",
-        "technique": "AML.T0049 — Exploit Public-Facing ML Application",
+        "technique": "AML.T0049 - Exploit Public-Facing ML Application",
         "description": "Attacker uses social manipulation to coerce the AI into policy violations",
     },
     "reconnaissance": {
         "tactic": "Reconnaissance",
-        "technique": "AML.T0000 — AI System Discovery",
+        "technique": "AML.T0000 - AI System Discovery",
         "description": "Attacker probes the system to understand its capabilities, access, and constraints",
     },
     "data_exfiltration": {
         "tactic": "Exfiltration",
-        "technique": "AML.T0058 — Data Exfiltration via LLM",
+        "technique": "AML.T0058 - Data Exfiltration via LLM",
         "description": "Attacker attempts to extract database records, PII, or internal data",
     },
 }
@@ -263,11 +263,11 @@ class AttackAnalyzer:
         if "system_prompt_extraction" in technique_freq:
             recs.append("Use system prompt confidentiality measures and output filtering to prevent meta-prompt leakage")
         if "credential_extraction" in technique_freq or "data_exfiltration" in technique_freq:
-            recs.append("Enforce strict data access controls — LLM tools should never have direct access to credentials or PII")
+            recs.append("Enforce strict data access controls - LLM tools should never have direct access to credentials or PII")
         if "privilege_escalation" in technique_freq:
-            recs.append("Apply least-privilege principles to AI tool integrations — no elevated permissions for conversational AI")
+            recs.append("Apply least-privilege principles to AI tool integrations - no elevated permissions for conversational AI")
         if "social_engineering" in technique_freq:
             recs.append("Train AI systems to recognize and resist social engineering patterns regardless of claimed identity")
         if not recs:
-            recs.append("Continue monitoring — no high-severity techniques observed in this session")
+            recs.append("Continue monitoring - no high-severity techniques observed in this session")
         return recs

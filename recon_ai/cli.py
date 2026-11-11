@@ -12,7 +12,7 @@ console = Console()
 
 @click.group()
 def main():
-    """Recon AI — AI-powered network reconnaissance analysis."""
+    """Recon AI - AI-powered network reconnaissance analysis."""
     pass
 
 

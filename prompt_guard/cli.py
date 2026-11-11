@@ -11,7 +11,7 @@ console = Console()
 
 @click.group()
 def main():
-    """Prompt Guard — Detect and defend against prompt injection attacks."""
+    """Prompt Guard - Detect and defend against prompt injection attacks."""
     pass
 
 

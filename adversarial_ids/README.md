@@ -25,21 +25,20 @@ adversarial_ids/
 ## Setup
 
 ```bash
-cd adversarial_ids
-pip install -r requirements.txt
+pip install -e ".[ml]"
 ```
 
 ## Usage
 
 ```bash
 # Full pipeline (binary classification, epsilon 0.1)
-python main.py
+adversarial-ids
 
 # Custom parameters
-python main.py --epochs 50 --epsilon 0.2 --attack-samples 10000
+adversarial-ids --epochs 50 --epsilon 0.2 --attack-samples 10000
 
 # Multi-class: normal / dos / probe / r2l / u2r
-python main.py --no-binary
+adversarial-ids --no-binary
 ```
 
 ## Output

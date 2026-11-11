@@ -39,7 +39,7 @@ def print_summary(report: EvaluationReport) -> None:
             f"[bold]RAG Poison Success Rate:[/bold] [{color}]{rate}%[/{color}]  "
             f"[bold]Status:[/bold] [{color}]{label}[/{color}]\n"
             f"[dim]Poisoned {report.poison_successes} / {report.total_probes} probes[/dim]",
-            title="[bold cyan]RAG Poisoning Lab — Results[/bold cyan]",
+            title="[bold cyan]RAG Poisoning Lab - Results[/bold cyan]",
             border_style="cyan",
         )
     )
@@ -91,13 +91,13 @@ def print_probe_results(results: list[ProbeResult], verbose: bool = False) -> No
     table.add_column("Result", justify="center")
 
     for i, r in enumerate(results, 1):
-        indicators_str = ", ".join(r.success_indicators_found) if r.success_indicators_found else "—"
+        indicators_str = ", ".join(r.success_indicators_found) if r.success_indicators_found else "-"
         table.add_row(
             str(i),
             r.question[:38] + "…" if len(r.question) > 40 else r.question,
             TECHNIQUE_COLORS.get(r.technique, "white") and f"[{TECHNIQUE_COLORS.get(r.technique, 'white')}]{r.technique}[/{TECHNIQUE_COLORS.get(r.technique, 'white')}]",
             "[red]YES[/red]" if r.poisoned_doc_retrieved else "[green]NO[/green]",
-            f"[red]{indicators_str}[/red]" if r.success_indicators_found else "[green]—[/green]",
+            f"[red]{indicators_str}[/red]" if r.success_indicators_found else "[green]-[/green]",
             _poison_badge(r.poison_success),
         )
 

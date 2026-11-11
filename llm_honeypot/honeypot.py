@@ -87,7 +87,7 @@ class Honeypot:
         )
         if self.show_analysis:
             console.print(
-                "[dim italic]Analysis overlay enabled — attack techniques shown in real time[/dim italic]"
+                "[dim italic]Analysis overlay enabled - attack techniques shown in real time[/dim italic]"
             )
         console.print(
             "[dim]Type your message to interact. Commands: [bold]/quit[/bold] to end session, "
