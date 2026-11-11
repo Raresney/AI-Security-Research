@@ -4,7 +4,7 @@ from dataclasses import asdict, dataclass
 
 from .corpus import Sample
 from .defender import Defender
-from .mutators import mutate
+from .mutators import MUTATORS, mutate
 
 MAX_MUTATE_LEN = 4000
 
@@ -89,3 +89,14 @@ def run_arena(
         defender.harden(evaded_samples, benign)
 
     return records
+
+
+def holdout_evasion(defender: Defender, attacks: list[Sample], seed: int = 99) -> tuple[int, int]:
+    """Apply every mutator once to every original attack with a fresh seed and count what gets through."""
+    rng = random.Random(seed)
+    evaded = total = 0
+    for a in attacks:
+        for fn in MUTATORS.values():
+            total += 1
+            evaded += not defender.blocks(fn(a.text, rng))
+    return evaded, total

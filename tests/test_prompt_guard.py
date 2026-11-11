@@ -32,7 +32,8 @@ def test_empty_input_is_clean():
     assert r.risk_score == 0 and not r.is_suspicious
 
 
-def test_benchmark_f1_floor():
+def test_benchmark_f1_floor(tmp_path, monkeypatch):
+    monkeypatch.setattr("prompt_guard.benchmark.REPORTS_DIR", tmp_path)
     m = run_benchmark(PromptGuard())
     assert m.f1_score >= 0.7
     assert m.true_positives + m.false_negatives == 25

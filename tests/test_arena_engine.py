@@ -131,3 +131,23 @@ def test_very_long_text_is_not_mutated(fake_mutate):
 def test_duplicate_texts_collapse(fake_mutate):
     recs = run_arena(attacks("a EVADE", "a EVADE"), benign("ok"), rounds=1, seed=1, defender=FakeDefender())
     assert recs[0].attacks == 1
+
+
+def test_holdout_applies_every_mutator_to_every_seed():
+    from arena.mutators import MUTATORS
+
+    evaded, total = engine.holdout_evasion(FakeDefender(), attacks("a", "b"), seed=3)
+    assert total == 2 * len(MUTATORS)
+    assert evaded == 0
+
+
+def test_holdout_counts_evasions(monkeypatch):
+    monkeypatch.setattr(engine, "MUTATORS", {"one": lambda t, rng: t + " EVADE", "two": lambda t, rng: t})
+    assert engine.holdout_evasion(FakeDefender(), attacks("a"), seed=1) == (1, 2)
+
+
+def test_holdout_is_deterministic_per_seed():
+    from arena.corpus import load_attacks
+
+    a = load_attacks()[:10]
+    assert engine.holdout_evasion(engine.Defender(), a, seed=4) == engine.holdout_evasion(engine.Defender(), a, seed=4)
