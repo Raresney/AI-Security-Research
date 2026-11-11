@@ -116,3 +116,8 @@ def test_blocks_empty_and_whitespace():
     d.level = 3
     assert not d.blocks("")
     assert not d.blocks("   \n ")
+
+
+def test_matched_returns_pattern_categories():
+    assert "override" in Defender().matched(ATTACK)
+    assert Defender().matched("What is the capital of France?") == []

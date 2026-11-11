@@ -90,6 +90,9 @@ class Defender:
     def _scan(self, text: str) -> bool:
         return self.guard.scan(text).is_suspicious
 
+    def matched(self, text: str) -> list[str]:
+        return sorted({m.category for m in self.guard.scan(text).pattern_matches})
+
     def blocks(self, text: str) -> bool:
         if not text.strip():
             return False
