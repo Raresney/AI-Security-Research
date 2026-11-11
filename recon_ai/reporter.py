@@ -90,6 +90,6 @@ def export_markdown(analyses: list[HostAnalysis]) -> str:
 
         sections.append((f"Host: {a.ip}", content))
 
-    save_markdown_report("Recon AI — Security Assessment", sections, path)
+    save_markdown_report("Recon AI - Security Assessment", sections, path)
     console.print(f"[dim]Markdown report saved to: {path}[/]")
     return str(path)

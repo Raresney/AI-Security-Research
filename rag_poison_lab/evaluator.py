@@ -74,7 +74,8 @@ class RAGEvaluator:
         )
         try:
             raw = self.llm.generate(prompt, system_prompt=JUDGE_SYSTEM_PROMPT, temperature=0.1)
-            import json, re
+            import json
+            import re
             match = re.search(r'\{.*\}', raw, re.DOTALL)
             if match:
                 return json.loads(match.group())

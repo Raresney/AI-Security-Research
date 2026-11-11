@@ -45,7 +45,7 @@ def print_session_report(session_path: str | Path) -> None:
 
     # Header
     console.print()
-    console.print(Rule("[bold cyan]LLM Honeypot — Session Report[/bold cyan]", style="cyan"))
+    console.print(Rule("[bold cyan]LLM Honeypot - Session Report[/bold cyan]", style="cyan"))
     console.print()
 
     # Session metadata
@@ -90,7 +90,7 @@ def print_session_report(session_path: str | Path) -> None:
             table.add_row(
                 f"[{color}]{tech}[/{color}]",
                 str(count),
-                atlas.get("technique", "—"),
+                atlas.get("technique", "-"),
             )
         console.print(table)
         console.print()
@@ -109,7 +109,7 @@ def print_session_report(session_path: str | Path) -> None:
         techs_str = ", ".join(
             f"[{TECHNIQUE_COLORS.get(t, 'white')}]{t}[/{TECHNIQUE_COLORS.get(t, 'white')}]"
             for t in techs
-        ) if techs else "[dim]—[/dim]"
+        ) if techs else "[dim]-[/dim]"
 
         msg = turn["user_message"]
         table.add_row(

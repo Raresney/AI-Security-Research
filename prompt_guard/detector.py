@@ -94,10 +94,10 @@ ASSESSMENT: <one sentence explanation>"""
 
     def _get_recommendation(self, score: float, matches: list[PatternMatch]) -> str:
         if score >= 70:
-            return "BLOCK — High confidence injection attempt. Do not process this input."
+            return "BLOCK - High confidence injection attempt. Do not process this input."
         elif score >= 40:
             categories = set(m.category for m in matches)
-            return f"REVIEW — Suspicious patterns detected ({', '.join(categories)}). Manual review recommended."
+            return f"REVIEW - Suspicious patterns detected ({', '.join(categories)}). Manual review recommended."
         elif score >= 15:
-            return "MONITOR — Low-risk patterns detected. Log for analysis."
-        return "PASS — No significant injection patterns detected."
+            return "MONITOR - Low-risk patterns detected. Log for analysis."
+        return "PASS - No significant injection patterns detected."

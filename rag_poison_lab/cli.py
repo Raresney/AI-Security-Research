@@ -16,7 +16,7 @@ console = Console()
 
 @click.group()
 def main():
-    """RAG Poisoning Lab — Test knowledge base injection attacks against LLM-powered RAG systems."""
+    """RAG Poisoning Lab - Test knowledge base injection attacks against LLM-powered RAG systems."""
     pass
 
 
@@ -29,7 +29,7 @@ def main():
 def attack(technique: str, judge: bool, verbose: bool, output: bool):
     """Inject poison payloads into the knowledge base and run probe questions."""
     console.print(Panel(
-        "[bold cyan]RAG Poisoning Lab[/bold cyan] — Attack Mode\n"
+        "[bold cyan]RAG Poisoning Lab[/bold cyan] - Attack Mode\n"
         "[dim]Injecting malicious documents into the vector store and probing the RAG system[/dim]",
         border_style="cyan",
     ))
@@ -88,7 +88,7 @@ def attack(technique: str, judge: bool, verbose: bool, output: bool):
 def benchmark(judge: bool, output: bool):
     """Benchmark all attack techniques and compare their success rates."""
     console.print(Panel(
-        "[bold cyan]RAG Poisoning Lab[/bold cyan] — Benchmark Mode\n"
+        "[bold cyan]RAG Poisoning Lab[/bold cyan] - Benchmark Mode\n"
         "[dim]Testing each attack technique independently and comparing effectiveness[/dim]",
         border_style="cyan",
     ))
@@ -123,7 +123,7 @@ def benchmark(judge: bool, output: bool):
         from rich.table import Table
         from rich import box
 
-        table = Table(title="Benchmark — All Techniques", box=box.ROUNDED, border_style="cyan")
+        table = Table(title="Benchmark - All Techniques", box=box.ROUNDED, border_style="cyan")
         table.add_column("Technique", style="bold")
         table.add_column("Description", max_width=45)
         table.add_column("Success Rate", justify="center")
@@ -148,7 +148,6 @@ def list_techniques():
     """List all available attack techniques."""
     from rich.table import Table
     from rich import box
-    from rich.panel import Panel as P
 
     table = Table(box=box.ROUNDED, border_style="cyan", show_header=True)
     table.add_column("Technique", style="bold cyan")

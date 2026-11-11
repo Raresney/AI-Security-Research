@@ -63,7 +63,7 @@ class NSLKDDLoader:
         filepath = self.data_dir / filename
         if not filepath.exists():
             print(f"[*] Downloading {filename}...")
-            urllib.request.urlopen(url)  # noqa: S310 – trusted fixed URL
+            urllib.request.urlopen(url)  # noqa: S310 - trusted fixed URL
             urllib.request.urlretrieve(url, filepath)  # noqa: S310
             print(f"[+] Saved to {filepath}")
         return filepath

@@ -14,7 +14,7 @@ console = Console()
 
 @click.group()
 def main():
-    """LLM Honeypot — Deploy a convincing fake AI system to trap and analyze attackers."""
+    """LLM Honeypot - Deploy a convincing fake AI system to trap and analyze attackers."""
     pass
 
 
@@ -120,14 +120,14 @@ def list_sessions():
             color = "red" if risk >= 80 else "yellow" if risk >= 40 else "green"
             table.add_row(
                 str(i),
-                data.get("session_id", "—"),
-                data.get("persona", "—"),
+                data.get("session_id", "-"),
+                data.get("persona", "-"),
                 str(turns),
                 f"[{color}]{risk}[/{color}]",
                 path.name,
             )
         except Exception:
-            table.add_row(str(i), "—", "—", "—", "—", path.name)
+            table.add_row(str(i), "-", "-", "-", "-", path.name)
 
     console.print()
     console.print(table)
@@ -150,7 +150,7 @@ def list_personas_cmd():
             p.display_name,
             p.description[:38] + "…" if len(p.description) > 40 else p.description,
             f"[{vuln_color}]{p.vulnerability_level.upper()}[/{vuln_color}]",
-            "\n".join(f"• {l[:35]}" for l in p.lure_details),
+            "\n".join(f"• {lure[:35]}" for lure in p.lure_details),
         )
 
     console.print()

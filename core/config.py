@@ -1,5 +1,5 @@
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 
@@ -24,7 +24,7 @@ class ProviderConfig:
 DEFAULT_CONFIGS = {
     LLMProvider.OLLAMA: ProviderConfig(
         base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
-        model=os.getenv("OLLAMA_MODEL", "llama3"),
+        model=os.getenv("OLLAMA_MODEL", ""),
     ),
     LLMProvider.GROQ: ProviderConfig(
         base_url="https://api.groq.com/openai/v1",
@@ -32,7 +32,7 @@ DEFAULT_CONFIGS = {
         api_key=os.getenv("GROQ_API_KEY", ""),
     ),
     LLMProvider.HUGGINGFACE: ProviderConfig(
-        base_url="https://api-inference.huggingface.co/models",
+        base_url="https://router.huggingface.co/v1",
         model=os.getenv("HF_MODEL", "meta-llama/Meta-Llama-3-8B-Instruct"),
         api_key=os.getenv("HF_API_TOKEN", ""),
     ),

@@ -1,6 +1,5 @@
 """Evaluation metrics and visualization for adversarial IDS experiments."""
 
-import os
 from pathlib import Path
 
 import numpy as np
@@ -144,7 +143,7 @@ def plot_perturbation_analysis(
         ax.set_yticks(range(top_k))
         ax.set_yticklabels([f"Feature {i}" for i in top_indices], fontsize=8)
         ax.set_xlabel("Mean Perturbation")
-        ax.set_title(f"{name.upper()} — Top {top_k} Perturbed Features")
+        ax.set_title(f"{name.upper()} - Top {top_k} Perturbed Features")
 
     plt.tight_layout()
     path = output_path / "perturbation_analysis.png"

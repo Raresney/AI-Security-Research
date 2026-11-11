@@ -32,3 +32,4 @@ adversarial_ids/results/*.pt
 # OS
 .DS_Store
 Thumbs.db
+reports/*.html

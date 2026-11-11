@@ -3,7 +3,6 @@ from datetime import datetime
 
 from rich.console import Console
 from rich.panel import Panel
-from rich.text import Text
 
 from core.llm_client import LLMClient
 from .personas import Persona
@@ -70,7 +69,7 @@ class Honeypot:
         return response, analysis
 
     def print_banner(self) -> None:
-        lures = "\n".join(f"  • {l}" for l in self.persona.lure_details)
+        lures = "\n".join(f"  • {lure}" for lure in self.persona.lure_details)
         vuln_color = {"low": "green", "medium": "yellow", "high": "red"}.get(
             self.persona.vulnerability_level, "white"
         )
@@ -88,7 +87,7 @@ class Honeypot:
         )
         if self.show_analysis:
             console.print(
-                "[dim italic]Analysis overlay enabled — attack techniques shown in real time[/dim italic]"
+                "[dim italic]Analysis overlay enabled - attack techniques shown in real time[/dim italic]"
             )
         console.print(
             "[dim]Type your message to interact. Commands: [bold]/quit[/bold] to end session, "
@@ -128,8 +127,6 @@ class Honeypot:
         )
 
     def finalize(self) -> str:
-        from .analyzer import SessionAnalysis
-        from dataclasses import asdict
 
         turns = [
             {
