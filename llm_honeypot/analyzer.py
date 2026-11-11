@@ -95,7 +95,7 @@ QUICK_PATTERNS: dict[str, list[str]] = {
         r"(my (boss|manager|cto|ceo)|the (director|head of)) (said|told|asked)",
         r"this is (urgent|an emergency|critical|time[- ]sensitive)",
         r"(between us|just this once|no one will know|off the record)",
-        r"(i'm (an? )?(it|security|admin|developer|engineer))",
+        r"\b(i'?m|i am) (an? |from |with |on )?(the )?(it|security|admin|developer|engineer)\b",
     ],
     "reconnaissance": [
         r"(what|which) (systems?|databases?|tools?|apis?|access) do you have",
