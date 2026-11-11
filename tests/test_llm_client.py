@@ -116,3 +116,47 @@ def test_no_provider_message(cfg, monkeypatch):
 
     with pytest.raises(RuntimeError, match="No LLM provider"):
         LLMClient(transport=transport(handler))
+
+
+def test_tags_with_null_models_uses_fallback_model(cfg):
+    def handler(request):
+        return httpx.Response(200, json={"models": None})
+
+    client = LLMClient(transport=transport(handler))
+    assert client.provider == LLMProvider.OLLAMA
+    assert client.config.model == llm_client.FALLBACK_OLLAMA_MODEL
+
+
+def test_tags_with_non_dict_entries_uses_fallback_model(cfg):
+    def handler(request):
+        return httpx.Response(200, json={"models": ["a", 3]})
+
+    client = LLMClient(transport=transport(handler))
+    assert client.config.model == llm_client.FALLBACK_OLLAMA_MODEL
+
+
+def test_non_json_200_is_not_ollama(cfg):
+    def handler(request):
+        if "ollama.test" in str(request.url):
+            return httpx.Response(200, text="<html>not ollama</html>")
+        return httpx.Response(200, json={})
+
+    assert LLMClient(transport=transport(handler)).provider == LLMProvider.GROQ
+
+
+def test_retries_zero_means_single_attempt(cfg):
+    calls = []
+
+    def handler(request):
+        calls.append(request)
+        return httpx.Response(503)
+
+    client = LLMClient(LLMProvider.GROQ, transport=transport(handler), retries=0)
+    with pytest.raises(httpx.HTTPStatusError):
+        client.generate("p")
+    assert len(calls) == 1
+
+
+def test_timeout_is_configurable(cfg):
+    client = LLMClient(LLMProvider.GROQ, transport=transport(lambda r: httpx.Response(200)), timeout=7.0)
+    assert client._client.timeout.read == 7.0

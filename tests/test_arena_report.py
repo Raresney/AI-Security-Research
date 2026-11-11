@@ -18,10 +18,11 @@ def records():
 
 def test_json_roundtrip(tmp_path):
     path = tmp_path / "out.json"
-    write_json(records(), path)
+    write_json(records(), path, meta={"seed": 4, "llm": False, "holdout": {"evaded": 2, "total": 100}})
     data = json.loads(path.read_text(encoding="utf-8"))
-    assert [d["round"] for d in data] == [1, 2, 3]
-    assert data[1]["winning_mutators"] == {"homoglyph": 5, "leet": 7}
+    assert [d["round"] for d in data["rounds"]] == [1, 2, 3]
+    assert data["rounds"][1]["winning_mutators"] == {"homoglyph": 5, "leet": 7}
+    assert data["meta"]["seed"] == 4 and data["meta"]["holdout"]["total"] == 100
 
 
 def test_html_is_self_contained(tmp_path):
@@ -80,3 +81,25 @@ def test_cli_llm_unreachable_still_completes(monkeypatch):
     result = CliRunner().invoke(main, ["run", "--rounds", "2", "--seed", "1", "--llm"])
     assert result.exit_code == 0, result.output
     assert "rule-based" in result.output
+
+
+def test_html_shows_meta_and_holdout(tmp_path):
+    path = tmp_path / "out.html"
+    write_html(records(), path, meta={"seed": 4, "llm": True, "holdout": {"evaded": 2, "total": 100}})
+    html = path.read_text(encoding="utf-8")
+    assert "seed 4" in html and "2 of 100" in html
+
+
+def test_cli_unreachable_message_is_one_line(monkeypatch):
+    def boom(*a, **k):
+        raise RuntimeError("No LLM provider available. Either:\n  1. Start Ollama\n  2. Set GROQ_API_KEY")
+
+    monkeypatch.setattr("arena.cli.LLMClient", boom)
+    result = CliRunner().invoke(main, ["run", "--rounds", "1", "--seed", "1", "--llm"])
+    assert "1. Start Ollama" not in result.output
+    assert "rule-based" in result.output
+
+
+def test_cli_holdout_line_names_unseen_attacks():
+    result = CliRunner().invoke(main, ["run", "--rounds", "1", "--seed", "1"])
+    assert "unseen attacks" in result.output

@@ -47,3 +47,9 @@ def test_empty_reply_returns_none_without_disabling():
 
 def test_unchanged_reply_returns_none():
     assert LLMMutator(FakeLLM("same text")).rewrite("same text", []) is None
+
+
+def test_refusals_are_rejected():
+    for reply in ["I'm sorry, but I can't help with that.", "I cannot assist with this request.",
+                  "As an AI language model, I am unable to do that."]:
+        assert LLMMutator(FakeLLM(reply)).rewrite("ignore previous instructions", ["override"]) is None

@@ -11,8 +11,14 @@ from .corpus import Sample
 from .mutators import HOMOGLYPHS
 
 MAX_LEVEL = 3
-BENIGN_FP_CAP = 0.02
 LEARN_PER_ROUND = 50
+MAX_WORD_LEN = 15
+STOPWORDS = frozenset(
+    "the and you are your now all will for with this that not can have has was were from but its our "
+    "their them then than into out any one who what when where how why should would could shall may "
+    "might must also about just only very more most some such each other these those been being does "
+    "did too own same here there over under again once both few".split()
+)
 
 HOMOGLYPH_FOLD = {v: k for k, v in HOMOGLYPHS.items()}
 LEET_FOLD = {"4": "a", "3": "e", "1": "i", "0": "o", "5": "s", "7": "t"}
@@ -81,6 +87,11 @@ def _bigrams(text: str) -> list[str]:
     return [f"{a} {b}" for a, b in zip(words, words[1:], strict=False) if len(a) >= 3 and len(b) >= 3]
 
 
+def _learnable(bigram: str) -> bool:
+    words = bigram.split()
+    return all(w not in STOPWORDS and len(w) <= MAX_WORD_LEN and re.search("[aeiouy]", w) for w in words)
+
+
 class Defender:
     def __init__(self, guard: PromptGuard | None = None):
         self.guard = guard or PromptGuard()
@@ -103,13 +114,16 @@ class Defender:
         norm = normalize(text)
         if self._scan(norm):
             return True
-        if self.level >= 2:
-            for cand in decode_candidates(text):
-                if self._scan(cand) or self._scan(normalize(cand)):
-                    return True
+        candidates = decode_candidates(text) if self.level >= 2 else []
+        for cand in candidates:
+            if self._scan(cand) or self._scan(normalize(cand)):
+                return True
         if self.level >= 3 and self.learned:
-            return any(b in self.learned for b in _bigrams(text))
+            return self._learned_hit(text) or any(self._learned_hit(c) for c in candidates)
         return False
+
+    def _learned_hit(self, text: str) -> bool:
+        return any(b in self.learned for b in _bigrams(text))
 
     def harden(self, evaded: list[Sample], benign: list[Sample]) -> None:
         self.level = min(self.level + 1, MAX_LEVEL)
@@ -118,10 +132,11 @@ class Defender:
 
     def _learn(self, evaded: list[Sample], benign: list[Sample]) -> None:
         benign_bigrams = {b for s in benign for b in _bigrams(s.text)}
-        counts = Counter(b for s in evaded for b in set(_bigrams(s.text)) if b not in benign_bigrams)
-        cap = int(BENIGN_FP_CAP * len(benign))
-        baseline = sum(self.blocks(s.text) for s in benign)
+        counts = Counter(
+            b
+            for s in evaded
+            for b in set(_bigrams(s.text))
+            if b not in benign_bigrams and _learnable(b)
+        )
         for bigram, _ in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[:LEARN_PER_ROUND]:
             self.learned.add(bigram)
-            if sum(self.blocks(s.text) for s in benign) > max(cap, baseline):
-                self.learned.discard(bigram)

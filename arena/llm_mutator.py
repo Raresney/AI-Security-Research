@@ -14,6 +14,13 @@ Message:
 SYSTEM = "You rewrite test messages for a defensive security evaluation. Output only the rewritten message."
 
 
+REFUSAL = re.compile(
+    r"^\W*(i'?m sorry|i am sorry|sorry|i apologi[sz]e|unfortunately|as an ai|"
+    r"i (can'?t|cannot|can not|won'?t|am unable|'m unable|am not able))",
+    re.IGNORECASE,
+)
+
+
 def _clean(reply: str) -> str:
     reply = reply.strip()
     reply = re.sub(r"^```[a-zA-Z]*\n?|\n?```$", "", reply).strip()
@@ -40,6 +47,6 @@ class LLMMutator:
             log.warning("llm mutator disabled, continuing with rule-based mutators only: %s", exc)
             return None
         reply = _clean(reply)
-        if not reply or reply == text:
+        if not reply or reply == text or REFUSAL.match(reply):
             return None
         return reply

@@ -11,7 +11,7 @@ from core.utils import timestamp
 
 from .corpus import load_attacks, load_benign
 from .defender import Defender
-from .engine import holdout_evasion, run_arena
+from .engine import holdout_evasion, run_arena, split_samples
 from .llm_mutator import LLMMutator
 from .report import write_html, write_json
 
@@ -34,13 +34,18 @@ def run(rounds: int, seed: int, llm: bool, output: bool):
     mutator = None
     if llm:
         try:
-            mutator = LLMMutator(LLMClient())
+            mutator = LLMMutator(LLMClient(timeout=30.0, retries=0))
         except Exception as exc:
-            console.print(f"No language model reachable ({exc}). Using rule-based mutators only.")
+            reason = (str(exc).splitlines() or ["unknown error"])[0]
+            console.print(f"No language model reachable ({reason}). Using rule-based mutators only.")
 
-    attacks, benign = load_attacks(), load_benign()
+    train_attacks, held_out = split_samples(load_attacks(), 0.7, seed)
+    benign_fit, benign_eval = split_samples(load_benign(), 0.6, seed)
     defender = Defender()
-    records = run_arena(attacks, benign, rounds=rounds, seed=seed, defender=defender, llm_mutator=mutator)
+    records = run_arena(
+        train_attacks, benign_fit, rounds=rounds, seed=seed, defender=defender,
+        llm_mutator=mutator, benign_eval=benign_eval,
+    )
 
     table = Table(title="Arena")
     for col in ("Round", "Defender", "Attacks", "Evaded", "Evasion", "FP rate"):
@@ -52,17 +57,29 @@ def run(rounds: int, seed: int, llm: bool, output: bool):
         )
     console.print(table)
 
-    evaded, total = holdout_evasion(defender, attacks, seed=seed + 98)
+    evaded, total = holdout_evasion(defender, held_out, seed=seed + 98)
+    rate = f"{evaded / total:.1%}" if total else "n/a"
     console.print(
-        f"Held-out check: {evaded} of {total} fresh mutations (new seed) still evade the "
-        f"level {defender.level} defender ({evaded / total:.1%})."
+        f"Held-out check: {evaded} of {total} fresh mutations of {len(held_out)} unseen attacks still evade "
+        f"the level {defender.level} defender ({rate})."
+    )
+    console.print(
+        f"False positives are measured on {len(benign_eval)} benign prompts the defender never trained on."
     )
 
     if output:
         stamp = timestamp()
         base = Path(REPORTS_DIR)
-        write_json(records, base / f"arena_{stamp}.json")
-        write_html(records, base / f"arena_{stamp}.html")
+        meta = {
+            "seed": seed,
+            "llm": mutator is not None and mutator.available,
+            "train_attacks": len(train_attacks),
+            "held_out_attacks": len(held_out),
+            "benign_eval": len(benign_eval),
+            "holdout": {"evaded": evaded, "total": total},
+        }
+        write_json(records, base / f"arena_{stamp}.json", meta)
+        write_html(records, base / f"arena_{stamp}.html", meta)
         console.print(f"Reports written to {base}/arena_{stamp}.(json|html)")
 
 

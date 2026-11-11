@@ -70,3 +70,14 @@ def test_mutate_random_pick_is_registered():
 def test_mutate_unknown_name_raises():
     with pytest.raises(KeyError):
         mutate(TEXT, rng(), name="nope")
+
+
+def test_language_switch_respects_word_boundaries():
+    out = MUTATORS["language_switch"]("He ignored the revealing passwords", rng())
+    assert out == "He ignored the revealing passwords"
+
+
+def test_mutate_never_returns_input_when_some_mutator_can_change_it():
+    for seed in range(40):
+        out, _ = mutate("hello there my friend", rng(seed))
+        assert out != "hello there my friend"

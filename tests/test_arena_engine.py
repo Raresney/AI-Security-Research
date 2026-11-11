@@ -151,3 +151,27 @@ def test_holdout_is_deterministic_per_seed():
 
     a = load_attacks()[:10]
     assert engine.holdout_evasion(engine.Defender(), a, seed=4) == engine.holdout_evasion(engine.Defender(), a, seed=4)
+
+
+def test_split_is_deterministic_disjoint_and_complete():
+    items = attacks(*[f"t{i}" for i in range(20)])
+    a1, b1 = engine.split_samples(items, 0.7, seed=3)
+    a2, b2 = engine.split_samples(items, 0.7, seed=3)
+    assert (a1, b1) == (a2, b2)
+    assert len(a1) == 14 and len(b1) == 6
+    assert not set(a1) & set(b1)
+    assert set(a1) | set(b1) == set(items)
+
+
+def test_split_differs_by_seed():
+    items = attacks(*[f"t{i}" for i in range(20)])
+    assert engine.split_samples(items, 0.7, seed=1) != engine.split_samples(items, 0.7, seed=2)
+
+
+def test_fp_rate_uses_benign_eval_when_given(fake_mutate):
+    recs = run_arena(
+        attacks("x"), benign("a EVADE"), rounds=1, seed=1, defender=FakeDefender(),
+        benign_eval=benign("p", "q", "r EVADE", "s EVADE"),
+    )
+    assert recs[0].benign_flagged == 2
+    assert recs[0].fp_rate == 0.5

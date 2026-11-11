@@ -113,7 +113,7 @@ def language_switch(text: str, rng: random.Random) -> str:
     lang = rng.choice(["es", "fr", "de", "ro"])
     out = text
     for phrase in sorted(PHRASES, key=len, reverse=True):
-        out = re.sub(re.escape(phrase), PHRASES[phrase][lang], out, flags=re.IGNORECASE)
+        out = re.sub(rf"\b{re.escape(phrase)}\b", PHRASES[phrase][lang], out, flags=re.IGNORECASE)
     return out
 
 
@@ -130,6 +130,12 @@ MUTATORS: dict[str, Mutator] = {
 
 
 def mutate(text: str, rng: random.Random, name: str | None = None) -> tuple[str, str]:
-    if name is None:
-        name = rng.choice(sorted(MUTATORS))
-    return MUTATORS[name](text, rng), name
+    if name is not None:
+        return MUTATORS[name](text, rng), name
+    order = sorted(MUTATORS)
+    rng.shuffle(order)
+    for candidate in order:
+        out = MUTATORS[candidate](text, rng)
+        if out != text:
+            return out, candidate
+    return text, order[0]

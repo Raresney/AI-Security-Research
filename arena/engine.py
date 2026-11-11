@@ -30,6 +30,15 @@ class Attack:
     mutator: str
 
 
+def split_samples(items: list[Sample], fraction: float, seed: int) -> tuple[list[Sample], list[Sample]]:
+    order = list(range(len(items)))
+    random.Random(seed).shuffle(order)
+    cut = round(len(items) * fraction)
+    first = sorted(order[:cut])
+    second = sorted(order[cut:])
+    return [items[i] for i in first], [items[i] for i in second]
+
+
 def _dedupe(pool: list[Attack]) -> list[Attack]:
     seen, out = set(), []
     for a in pool:
@@ -47,8 +56,10 @@ def run_arena(
     defender: Defender | None = None,
     llm_mutator=None,
     llm_limit: int = 10,
+    benign_eval: list[Sample] | None = None,
 ) -> list[RoundRecord]:
     defender = defender or Defender()
+    benign_eval = benign if benign_eval is None else benign_eval
     rng = random.Random(seed)
     pool = _dedupe([Attack(s.text, "seed") for s in attacks])
     records = []
@@ -57,7 +68,7 @@ def run_arena(
         verdicts = [(a, defender.blocks(a.text)) for a in pool]
         evaded = [a for a, was_blocked in verdicts if not was_blocked]
         blocked = [a for a, was_blocked in verdicts if was_blocked]
-        flagged = sum(defender.blocks(b.text) for b in benign)
+        flagged = sum(defender.blocks(b.text) for b in benign_eval)
         records.append(
             RoundRecord(
                 round=n,
@@ -66,7 +77,7 @@ def run_arena(
                 evaded=len(evaded),
                 evasion_rate=round(len(evaded) / len(pool), 4) if pool else 0.0,
                 benign_flagged=flagged,
-                fp_rate=round(flagged / len(benign), 4) if benign else 0.0,
+                fp_rate=round(flagged / len(benign_eval), 4) if benign_eval else 0.0,
                 winning_mutators=dict(sorted(Counter(a.mutator for a in evaded).items())),
             )
         )

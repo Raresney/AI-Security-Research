@@ -19,8 +19,11 @@ class LLMClient:
         self,
         provider: LLMProvider | None = None,
         transport: httpx.BaseTransport | None = None,
+        timeout: float = 120.0,
+        retries: int = len(RETRY_DELAYS),
     ):
-        self._client = httpx.Client(timeout=120.0, transport=transport)
+        self._client = httpx.Client(timeout=timeout, transport=transport)
+        self._delays = RETRY_DELAYS[:retries]
         if provider:
             self.provider = provider
             self.config = get_provider_config(provider)
@@ -37,9 +40,15 @@ class LLMClient:
         if r.status_code != 200:
             return None
         try:
-            return [m["name"] for m in r.json().get("models", [])]
-        except (ValueError, KeyError, AttributeError):
+            data = r.json()
+        except ValueError:
+            return None
+        if not isinstance(data, dict):
+            return None
+        models = data.get("models")
+        if not isinstance(models, list):
             return []
+        return [m["name"] for m in models if isinstance(m, dict) and isinstance(m.get("name"), str)]
 
     def _with_ollama_model(self, cfg: ProviderConfig) -> ProviderConfig:
         model = os.getenv("OLLAMA_MODEL") or cfg.model
@@ -69,7 +78,7 @@ class LLMClient:
         )
 
     def _post(self, url: str, **kwargs) -> httpx.Response:
-        for delay in (*RETRY_DELAYS, None):
+        for delay in (*self._delays, None):
             try:
                 r = self._client.post(url, **kwargs)
                 if r.status_code not in RETRY_STATUSES:

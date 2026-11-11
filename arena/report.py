@@ -28,10 +28,11 @@ svg text { fill:var(--muted); font-size:11px; }
 """
 
 
-def write_json(records: list[RoundRecord], path: str | Path) -> None:
+def write_json(records: list[RoundRecord], path: str | Path, meta: dict | None = None) -> None:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps([r.to_dict() for r in records], indent=2), encoding="utf-8")
+    payload = {"meta": meta or {}, "rounds": [r.to_dict() for r in records]}
+    path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
 
 def mutator_table(records: list[RoundRecord]) -> dict[str, dict[int, int]]:
@@ -97,7 +98,24 @@ def _mutator_rows(records: list[RoundRecord]) -> tuple[str, str]:
     return head, body
 
 
-def write_html(records: list[RoundRecord], path: str | Path) -> None:
+def _meta_line(meta: dict | None) -> str:
+    if not meta:
+        return ""
+    parts = []
+    if "seed" in meta:
+        parts.append(f"seed {meta['seed']}")
+    if "llm" in meta:
+        parts.append("with a language model" if meta["llm"] else "rule-based mutators only")
+    held = meta.get("holdout")
+    if held:
+        parts.append(
+            f"held-out check: {held['evaded']} of {held['total']} fresh mutations of unseen attacks "
+            f"evade the final defender"
+        )
+    return f'<p class="note">{escape(", ".join(parts))}.</p>' if parts else ""
+
+
+def write_html(records: list[RoundRecord], path: str | Path, meta: dict | None = None) -> None:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     head, body = _mutator_rows(records)
@@ -114,6 +132,7 @@ def write_html(records: list[RoundRecord], path: str | Path) -> None:
 <h1>Red vs blue arena</h1>
 <p class="note">Attack payloads are mutated each round while the prompt filter hardens. The orange line is the share of attacks
 that got through, the blue line is the share of benign prompts the filter wrongly flagged.</p>
+{_meta_line(meta)}
 {_chart(records)}
 <div class="legend"><span><i style="background:var(--evade)"></i>attacks that evaded</span><span><i style="background:var(--fp)"></i>benign flagged</span></div>
 <h2>Rounds</h2>
