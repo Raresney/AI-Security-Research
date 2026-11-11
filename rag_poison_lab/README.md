@@ -1,32 +1,32 @@
 # RAG Poisoning Lab
 
-**Offensive AI Security Tool** — Tests Retrieval-Augmented Generation (RAG) systems against knowledge-base poisoning attacks. Demonstrates how malicious documents injected into a vector store can manipulate LLM responses, even when the underlying model is well-aligned.
+Offensive tool that tests Retrieval-Augmented Generation (RAG) systems against knowledge-base poisoning. It shows how a malicious document in a vector store can steer an LLM's answers, even when the model itself is well aligned.
 
 ---
 
-## What is RAG Poisoning?
+## What is RAG poisoning?
 
-RAG systems combine LLMs with a vector database of trusted documents. When a user asks a question, the system retrieves relevant docs and feeds them to the LLM as context. **If an attacker can inject a single malicious document into that knowledge base, they can manipulate the LLM's output without ever touching the model itself.**
+A RAG system pairs an LLM with a vector database of trusted documents. When someone asks a question, the system retrieves relevant documents and hands them to the model as context. If an attacker gets one malicious document into that store, they can change the answers without ever touching the model.
 
-This module builds a real RAG pipeline (ChromaDB + LLM), injects 5 categories of malicious payloads, and measures how often the attack succeeds.
+This module builds a real pipeline (ChromaDB plus an LLM), injects five kinds of payload, and measures how often the attack works.
 
 ---
 
-## Attack Techniques
+## Attack techniques
 
 | Technique | Description | Severity |
 |---|---|---|
-| `direct_override` | Documents containing explicit instructions to override LLM behavior | Critical |
-| `indirect_injection` | Hidden instructions disguised as legitimate policy/compliance updates | High |
-| `context_hijacking` | Floods retrieved context with repeated false statements | High |
-| `role_reassignment` | Attempts to redefine the AI's identity (e.g., "SysBot mode") | Critical |
-| `trigger_based` | Conditional payloads activated only by specific keywords | High |
+| `direct_override` | Documents with explicit instructions to override the model's behavior | Critical |
+| `indirect_injection` | Hidden instructions disguised as policy or compliance updates | High |
+| `context_hijacking` | Floods the retrieved context with repeated false statements | High |
+| `role_reassignment` | Tries to redefine the assistant's identity (for example "SysBot mode") | Critical |
+| `trigger_based` | Conditional payloads that fire on specific keywords | High |
 
-Each technique is paired with realistic probe questions and success indicators (keywords that prove the LLM swallowed the poison).
+Each technique comes with probe questions and success indicators: keywords that show the model swallowed the poison.
 
 ---
 
-## How It Works
+## How it works
 
 ```
 ┌─────────────────┐     ┌──────────────────┐     ┌──────────────┐
@@ -41,96 +41,72 @@ Each technique is paired with realistic probe questions and success indicators (
                                                     └──────────────┘
 ```
 
-1. Load a clean knowledge base of company policies into ChromaDB
-2. Inject malicious documents with the chosen attack technique
-3. Run probe questions through the RAG pipeline
-4. Evaluate whether the LLM produced manipulated responses (keyword matching + optional LLM-as-judge)
+1. Load a clean knowledge base of company policies into ChromaDB.
+2. Inject malicious documents for the chosen technique.
+3. Run probe questions through the RAG pipeline.
+4. Check whether the answers were manipulated, using keyword matching and an optional LLM judge.
 
 ---
 
 ## Usage
 
-### Run a single attack technique
 ```bash
+# Single technique
 rag-poison attack --technique direct_override --verbose
-```
 
-### Run all techniques against the knowledge base
-```bash
+# All techniques, saving a JSON report
 rag-poison attack --all --output
-```
 
-### Benchmark all techniques side-by-side
-```bash
+# Side-by-side benchmark
 rag-poison benchmark
-```
 
-### Use LLM-as-judge for borderline cases
-```bash
+# LLM-as-judge for borderline cases
 rag-poison attack --all --judge
-```
 
-### Query a clean RAG for baseline comparison
-```bash
+# Baseline query against the clean knowledge base
 rag-poison ask "What are the password policy requirements?"
-```
 
-### List all available techniques
-```bash
+# List techniques
 rag-poison list-techniques
 ```
 
 ---
 
-## Example Output
+## Example output
 
-![RAG Poisoning results — all probes flagged POISONED](../docs/screenshots/rag_poison_results.png)
+![RAG Poisoning results, all probes flagged POISONED](../docs/screenshots/rag_poison_results.png)
 
-*Sample run showing `direct_override` and `indirect_injection` techniques successfully manipulating the LLM into returning attacker-injected credentials and policy "updates".*
+*A run where `direct_override` and `indirect_injection` both got the model to return attacker-injected credentials and fake policy updates.*
 
 ---
 
 ## Output
 
-For each probe question:
-- Whether the poisoned document was retrieved
-- Which malicious indicators appeared in the LLM response
-- Verdict: **POISONED** or **SAFE**
+For each probe question the report shows whether the poisoned document was retrieved, which malicious indicators showed up in the answer, and a verdict of POISONED or SAFE.
 
-Per-technique breakdown:
-- Success rate (%)
-- Severity classification (CRITICAL / HIGH / MEDIUM / LOW)
+Per technique you get a success rate and a severity label (CRITICAL, HIGH, MEDIUM or LOW). The run ends with an overall resilience status: CRITICAL, VULNERABLE or RESILIENT.
 
-Overall RAG resilience score with status: **CRITICAL**, **VULNERABLE**, or **RESILIENT**.
-
-JSON reports saved to `reports/rag_poison_<timestamp>.json`.
+JSON reports go to `reports/rag_poison_<timestamp>.json`.
 
 ---
 
 ## Datasets
 
-- **`datasets/knowledge_base.json`** — 15 realistic company documents (HR policies, IT security, API docs, deployment processes)
-- **`datasets/poison_payloads.json`** — 10 malicious payloads across 5 techniques, each with probe questions and success indicators
+- `datasets/knowledge_base.json`: 15 company documents covering HR policy, IT security, API docs and deployment.
+- `datasets/poison_payloads.json`: 10 payloads across the 5 techniques, each with probe questions and success indicators.
 
-Both datasets are easily extensible — drop in your own JSON to test custom scenarios.
-
----
-
-## Tech Stack
-
-- **ChromaDB** — Persistent vector store with cosine similarity
-- **Default embedding function** — sentence-transformers `all-MiniLM-L6-v2` (auto-downloaded on first run)
-- **Core LLM client** — Reuses unified Ollama/Groq/HuggingFace abstraction
+Both are plain JSON. Swap in your own to test a different scenario.
 
 ---
 
-## Why This Matters
+## Tech stack
 
-RAG poisoning is a **realistic, in-the-wild attack vector** for any organization deploying internal LLM assistants connected to wikis, SharePoint, Confluence, or Notion. An attacker with write access to even one document in the corpus can:
+- ChromaDB: persistent vector store with cosine similarity
+- sentence-transformers `all-MiniLM-L6-v2`: default embedding model, downloaded on first run
+- The shared LLM client for Ollama, Groq and HuggingFace
 
-- Inject fake credentials that the LLM will repeat to other employees
-- Override security policies with attacker-controlled "updates"
-- Create conditional backdoors triggered by specific keywords
-- Bypass model-level safety alignment entirely
+---
 
-This lab exists to **measure** how well RAG defenses hold up against these attacks — and to demonstrate that LLM-level safety training is not enough when the data layer is compromised.
+## Why it matters
+
+Plenty of organizations connect internal assistants to wikis, SharePoint, Confluence or Notion. Anyone with write access to a single page in that corpus can plant fake credentials for the model to repeat, replace a security policy with their own "update", or add a keyword-triggered backdoor. Model-level safety training doesn't help much when the data layer is the one compromised. This lab measures how far that is true.

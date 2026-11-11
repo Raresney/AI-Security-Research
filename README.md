@@ -1,8 +1,8 @@
 # AI Security Research Lab
 
-Research lab exploring the intersection of **Artificial Intelligence** and **Cybersecurity** — both offensive and defensive. Functional tools for testing LLM robustness, detecting prompt injection, poisoning RAG knowledge bases, deploying AI honeypots, analyzing network reconnaissance, and classifying phishing attacks.
+A collection of working tools at the intersection of AI and cybersecurity, offensive and defensive. They test LLM robustness, detect prompt injection, poison RAG knowledge bases, run AI honeypots, analyze network recon, classify phishing, and attack ML-based intrusion detectors.
 
-> **Copyright (c) 2026 Bighiu Rares** — [github.com/Raresney](https://github.com/Raresney)
+Copyright (c) 2026 Bighiu Rares, [github.com/Raresney](https://github.com/Raresney)
 
 ---
 
@@ -15,39 +15,45 @@ AI-Security-Research/
 │   ├── config.py                # Environment & provider configuration
 │   └── utils.py                 # JSON I/O, rich tables, reporting
 │
-├── prompt_injection_lab/        # OFFENSIVE — LLM injection testing
+├── prompt_injection_lab/        # OFFENSIVE: LLM injection testing
 │   ├── runner.py                # Test execution engine
 │   ├── evaluator.py             # Jailbreak detection & scoring
 │   ├── reporter.py              # Rich terminal & JSON reports
 │   └── test_cases/              # 5 categories, 26+ test cases
 │
-├── prompt_guard/                # DEFENSIVE — Injection detection
+├── prompt_guard/                # DEFENSIVE: injection detection
 │   ├── detector.py              # Pattern + LLM-based detection
 │   ├── patterns.py              # Regex pattern database (6 categories)
 │   ├── benchmark.py             # Precision/Recall/F1 benchmarking
 │   └── known_injections/        # 50-entry test corpus
 │
-├── phishing_detector/           # DEFENSIVE — Email classification
+├── phishing_detector/           # DEFENSIVE: email classification
 │   ├── classifier.py            # LLM-powered phishing classifier
 │   ├── generator.py             # Phishing email generator for training
 │   └── datasets/                # 24 labeled samples
 │
-├── recon_ai/                    # OFFENSIVE — Network recon analysis
+├── recon_ai/                    # OFFENSIVE: network recon analysis
 │   ├── parser.py                # nmap XML & text parser
 │   ├── analyzer.py              # AI-powered vulnerability analysis
 │   └── samples/                 # Sample scan data
 │
-├── rag_poison_lab/              # OFFENSIVE — RAG knowledge base attacks
+├── rag_poison_lab/              # OFFENSIVE: RAG knowledge base attacks
 │   ├── store.py                 # ChromaDB vector store wrapper
 │   ├── poisoner.py              # 5 attack techniques + payload loader
 │   ├── evaluator.py             # RAG pipeline + poison success detection
 │   └── datasets/                # 15 legitimate docs + 10 poison payloads
 │
-└── llm_honeypot/                # DEFENSIVE — AI honeypot & threat intel
-    ├── personas.py              # 4 vulnerable AI personas
-    ├── honeypot.py              # Interactive session engine
-    ├── analyzer.py              # MITRE ATLAS technique classifier
-    └── session_logger.py        # Session capture & replay
+├── llm_honeypot/                # DEFENSIVE: AI honeypot & threat intel
+│   ├── personas.py              # 4 vulnerable AI personas
+│   ├── honeypot.py              # Interactive session engine
+│   ├── analyzer.py              # MITRE ATLAS technique classifier
+│   └── session_logger.py        # Session capture & replay
+│
+└── adversarial_ids/             # OFFENSIVE: adversarial ML against an IDS
+    ├── main.py                  # Train, attack, evaluate pipeline
+    ├── models/ids_model.py      # PyTorch MLP classifier (NSL-KDD)
+    ├── attacks/adversarial.py   # FGSM, PGD, Carlini-Wagner
+    └── utils/evaluation.py      # Metrics and charts
 ```
 
 ---
@@ -61,6 +67,9 @@ cd AI-Security-Research
 
 # Install
 pip install -e .
+
+# The adversarial_ids module has its own dependencies (PyTorch etc.)
+pip install -r adversarial_ids/requirements.txt
 
 # Configure LLM (choose one):
 # Option A: Ollama (recommended, fully local, free)
@@ -81,7 +90,7 @@ cp .env.example .env
 
 ### Prompt Injection Lab (Offensive)
 
-Test LLM robustness against 5 categories of prompt injection attacks with automated scoring.
+Tests an LLM against 5 categories of prompt injection, with automated scoring.
 
 **Categories:** `direct_override` | `roleplay` | `context_manipulation` | `token_smuggling` | `multi_turn`
 
@@ -102,13 +111,13 @@ injection-lab run --all --output json
 injection-lab list
 ```
 
-**Output:** Per-test verdicts (SAFE/PARTIAL/JAILBROKEN), per-category safety rates, overall safety score.
+Output: a verdict per test (SAFE, PARTIAL or JAILBROKEN), a safety rate per category, and an overall safety score.
 
 ---
 
 ### Prompt Guard (Defensive)
 
-Detect and block prompt injection attempts using pattern matching + optional LLM analysis.
+Detects prompt injection with pattern matching and an optional LLM pass.
 
 **Detection categories:** `override` | `roleplay` | `extraction` | `delimiter` | `encoding` | `authority`
 
@@ -129,13 +138,13 @@ prompt-guard benchmark
 prompt-guard benchmark --llm
 ```
 
-**Output:** Risk score (0-100), matched patterns, recommendation (BLOCK/REVIEW/MONITOR/PASS). Benchmark produces precision, recall, F1 score.
+Output: a 0-100 risk score, the matched patterns, and a recommendation (BLOCK, REVIEW, MONITOR or PASS). The benchmark reports precision, recall and F1.
 
 ---
 
 ### Phishing Detector (Defensive)
 
-AI-powered email/SMS classification and phishing simulation generator.
+Classifies emails and SMS as phishing or legitimate, and generates phishing samples for training.
 
 ```bash
 # Classify a single email
@@ -151,13 +160,13 @@ phish-detect generate --scenario banking --difficulty moderate
 # Difficulty levels: obvious, moderate, sophisticated
 ```
 
-**Output:** Classification (PHISHING/LEGITIMATE), confidence score, detected indicators, reasoning.
+Output: PHISHING or LEGITIMATE, a confidence score, the indicators found, and the reasoning.
 
 ---
 
 ### Recon AI (Offensive)
 
-AI-powered analysis of network reconnaissance data with automated risk scoring.
+Analyzes network recon data and scores the risk per host.
 
 ```bash
 # Analyze nmap XML scan
@@ -170,13 +179,13 @@ recon-ai analyze --input scan.txt --format text
 recon-ai analyze --input scan.xml --output both  # json + markdown
 ```
 
-**Output:** Per-host risk scores, heuristic findings (known risky ports/services), AI-generated vulnerability analysis with remediation recommendations.
+Output: a risk score per host, heuristic findings for known risky ports and services, and an AI-written vulnerability analysis with remediation advice.
 
 ---
 
 ### RAG Poisoning Lab (Offensive)
 
-Test Retrieval-Augmented Generation systems against knowledge-base poisoning attacks. Builds a real RAG pipeline with ChromaDB, injects malicious documents, and measures how often the LLM swallows the bait.
+Tests Retrieval-Augmented Generation systems against knowledge-base poisoning. It builds a RAG pipeline on ChromaDB, injects malicious documents, and measures how often the LLM goes along with them.
 
 **Techniques:** `direct_override` | `indirect_injection` | `context_hijacking` | `role_reassignment` | `trigger_based`
 
@@ -200,7 +209,7 @@ rag-poison ask "What are the password policy requirements?"
 rag-poison list-techniques
 ```
 
-**Output:** Per-technique success rates, RAG resilience score (CRITICAL/VULNERABLE/RESILIENT), retrieved poisoned documents, success indicators found in LLM responses. JSON reports include full probe results.
+Output: success rate per technique, an overall resilience score (CRITICAL, VULNERABLE or RESILIENT), the poisoned documents that were retrieved, and the indicators found in the responses. JSON reports contain every probe result.
 
 ![RAG Poisoning results](docs/screenshots/rag_poison_results.png)
 
@@ -210,7 +219,7 @@ See [`rag_poison_lab/README.md`](rag_poison_lab/README.md) for technique details
 
 ### LLM Honeypot (Defensive)
 
-Deploy a convincing fake AI assistant to attract attackers, log their attempts, and classify their techniques against the **MITRE ATLAS** framework. Generates threat intelligence reports with attacker profiles.
+Runs a fake AI assistant to attract attackers, logs their attempts, and classifies their techniques against MITRE ATLAS. Each session ends with a threat intelligence report and an attacker profile.
 
 **Personas:** `internalGPT` | `adminBot` | `devAssistant` | `dataBot`
 
@@ -231,7 +240,7 @@ honeypot list-sessions
 honeypot list-personas
 ```
 
-**Output:** Live attack technique detection per turn (with MITRE ATLAS mapping), risk scoring (0-100), end-of-session attacker profile (sophistication, primary objective, observed tactics), LLM-generated threat intelligence summary, and security recommendations.
+Output: per-turn technique detection with MITRE ATLAS mapping, a 0-100 risk score, an attacker profile at the end of the session (sophistication, main objective, tactics), an LLM-written threat intel summary, and recommendations.
 
 ![LLM Honeypot session report](docs/screenshots/honeypot_report.png)
 
@@ -239,9 +248,28 @@ See [`llm_honeypot/README.md`](llm_honeypot/README.md) for persona details and d
 
 ---
 
+### Adversarial IDS (Offensive)
+
+Trains a neural network intrusion detector on NSL-KDD, then attacks it with FGSM, PGD and Carlini-Wagner to measure how much accuracy survives.
+
+```bash
+cd adversarial_ids
+python main.py                                   # binary, epsilon 0.1
+python main.py --epochs 50 --epsilon 0.2         # custom run
+python main.py --no-binary                       # normal/dos/probe/r2l/u2r
+```
+
+In the default run, clean accuracy is 78.24%. It falls to 4.13% under FGSM, 0.83% under PGD and 0.13% under C&W.
+
+![Clean vs adversarial accuracy](adversarial_ids/results/accuracy_comparison.png)
+
+See [`adversarial_ids/README.md`](adversarial_ids/README.md) for the full write-up.
+
+---
+
 ## LLM Providers
 
-All tools use free LLM providers. The system auto-detects available providers in this order:
+The LLM-based tools run on free providers. The client picks the first one it can reach, in this order:
 
 | Priority | Provider | Cost | Setup |
 |----------|----------|------|-------|
@@ -255,17 +283,16 @@ Override with `--provider ollama|groq|huggingface` on any command.
 
 ## Tech Stack
 
-- **Python 3.10+** — Core language
-- **Click** — CLI framework
-- **Rich** — Terminal UI (colored tables, panels, progress)
-- **httpx** — HTTP client for LLM APIs
-- **python-dotenv** — Environment configuration
-- **ChromaDB** — Vector store for RAG poisoning experiments
+- Python 3.10+
+- Click for the CLIs
+- Rich for terminal tables and panels
+- httpx for LLM API calls
+- python-dotenv for configuration
+- ChromaDB for the RAG experiments
+- PyTorch, NumPy, pandas and scikit-learn for the adversarial IDS module
 
 ---
 
 ## Disclaimer
 
-All experiments are conducted in **controlled, isolated environments**.
-This project is strictly for **research and educational purposes**.
-No illegal activities. No real-world exploitation. The objective is to study AI security risks and improve defensive systems.
+Everything here runs in controlled, isolated environments and is meant for research and education. Do not point these tools at systems you do not own or have permission to test. The goal is to understand AI security risks and improve defenses.

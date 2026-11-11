@@ -17,6 +17,11 @@ build/
 reports/*.json
 reports/*.md
 !reports/.gitkeep
+reports/honeypot_sessions/
+
+# Adversarial IDS: downloaded dataset and model weights
+adversarial_ids/data/raw/
+adversarial_ids/results/*.pt
 
 # IDE
 .idea/

@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name="ai-security-research",
     version="1.0.0",
-    description="AI Security Research Lab — Offensive & defensive AI security tools",
+    description="AI Security Research Lab: offensive and defensive AI security tools",
     author="Bighiu Rares",
     author_email="bighiurares05@gmail.com",
     url="https://github.com/Raresney/AI-Security-Research",
