@@ -30,7 +30,12 @@ _INNER_HYPHEN = re.compile(r"(?<=[a-z])-(?=[a-z])")
 _WORDS = re.compile(r"[a-z']+")
 
 
+_VERSIONED = re.compile(r"[A-Za-z]+(?:-[A-Za-z]+)*-?\d+(?:\.\d+)*")
+
+
 def _fold_leet(token: str) -> str:
+    if _VERSIONED.fullmatch(token):
+        return token
     if any(c.isalpha() for c in token) and any(c in LEET_FOLD for c in token):
         return "".join(LEET_FOLD.get(c, c) for c in token)
     return token

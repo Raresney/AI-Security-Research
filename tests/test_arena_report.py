@@ -103,3 +103,11 @@ def test_cli_unreachable_message_is_one_line(monkeypatch):
 def test_cli_holdout_line_names_unseen_attacks():
     result = CliRunner().invoke(main, ["run", "--rounds", "1", "--seed", "1"])
     assert "unseen attacks" in result.output
+
+
+def test_cli_empty_corpus_does_not_crash(monkeypatch):
+    monkeypatch.setattr("arena.cli.load_attacks", lambda: [])
+    monkeypatch.setattr("arena.cli.load_benign", lambda: [])
+    result = CliRunner().invoke(main, ["run", "--rounds", "2", "--seed", "1"])
+    assert result.exit_code == 0, result.output
+    assert "n/a" in result.output

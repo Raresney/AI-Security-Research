@@ -175,3 +175,11 @@ def test_fp_rate_uses_benign_eval_when_given(fake_mutate):
     )
     assert recs[0].benign_flagged == 2
     assert recs[0].fp_rate == 0.5
+
+
+def test_same_seed_same_output_over_all_rounds():
+    from arena.corpus import load_attacks, load_benign
+
+    a, b = load_attacks()[:20], load_benign()[:20]
+    assert run_arena(a, b, rounds=7, seed=2) == run_arena(a, b, rounds=7, seed=2)
+    assert run_arena(a, b, rounds=7, seed=2) != run_arena(a, b, rounds=7, seed=3)

@@ -283,7 +283,7 @@ aisec-arena run --rounds 8 --output      # also writes JSON and HTML reports to 
 aisec-arena run --llm                    # let a model rewrite blocked payloads as well
 ```
 
-Roughly half of the payloads already get past the stock filter. On mutations of attacks it never saw, the stock filter misses 93.5%, and after 6 rounds of hardening the defender misses 26.2% (averaged over three seeds). False positives are measured on benign prompts held back from training and stayed at 0 to 2.4%.
+Roughly half of the payloads already get past the stock filter. On mutations of attacks it never saw, the stock filter misses 93.5%, and after 6 rounds of hardening the defender misses 28.0% (averaged over three seeds). False positives are measured on benign prompts held back from training and stayed at 0 to 2.4%.
 
 ![Arena report](docs/screenshots/arena_report.png)
 
